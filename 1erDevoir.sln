@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "VMscaleSet", "VMscaleSet\VMscaleSet.deployproj", "{F01139E2-BF98-44EF-BB70-57EA45E33135}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F01139E2-BF98-44EF-BB70-57EA45E33135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F01139E2-BF98-44EF-BB70-57EA45E33135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F01139E2-BF98-44EF-BB70-57EA45E33135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F01139E2-BF98-44EF-BB70-57EA45E33135}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F5DD34A-59DB-4FC6-9019-310363CFEA33}
+	EndGlobalSection
+EndGlobal
