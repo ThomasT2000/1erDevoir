@@ -4,7 +4,7 @@ trigger:
 jobs:
 - job: TestKeyVaultAccess
   pool:
-    vmImage: 'ubuntu-latest' # ou un autre agent de votre choix
+    name: 'Default' # Pool d'agent auto-hébergé
   steps:
   - task: AzureKeyVault@2
     inputs:
