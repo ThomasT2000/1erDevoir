@@ -1,0 +1,99 @@
+{
+    "name": "VM2",
+    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/VM2",
+    "type": "Microsoft.Compute/virtualMachines",
+    "location": "eastus",
+    "tags": {
+        "VM2": ""
+    },
+    "properties": {
+        "hardwareProfile": {
+            "vmSize": "Standard_DC1s_v2"
+        },
+        "provisioningState": "Succeeded",
+        "vmId": "a46277c6-8bc3-4834-ae1b-4473be3a7aaf",
+        "additionalCapabilities": {
+            "hibernationEnabled": false
+        },
+        "storageProfile": {
+            "imageReference": {
+                "publisher": "MicrosoftWindowsDesktop",
+                "offer": "Windows-10",
+                "sku": "win10-22h2-pro-g2",
+                "version": "latest",
+                "exactVersion": "19045.5011.241005"
+            },
+            "osDisk": {
+                "osType": "Windows",
+                "name": "VM2_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9",
+                "createOption": "FromImage",
+                "caching": "ReadWrite",
+                "managedDisk": {
+                    "storageAccountType": "Premium_LRS",
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/disks/VM2_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9"
+                },
+                "deleteOption": "Delete",
+                "diskSizeGB": 127
+            },
+            "dataDisks": []
+        },
+        "osProfile": {
+            "computerName": "VM2",
+            "adminUsername": "userazure",
+            "windowsConfiguration": {
+                "provisionVMAgent": true,
+                "enableAutomaticUpdates": true,
+                "patchSettings": {
+                    "patchMode": "AutomaticByOS",
+                    "assessmentMode": "ImageDefault",
+                    "enableHotpatching": false
+                }
+            },
+            "secrets": [],
+            "allowExtensionOperations": true,
+            "requireGuestProvisionSignal": true
+        },
+        "networkProfile": {
+            "networkInterfaces": [
+                {
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm2504_z1",
+                    "properties": {
+                        "deleteOption": "Detach"
+                    }
+                }
+            ]
+        },
+        "diagnosticsProfile": {
+            "bootDiagnostics": {
+                "enabled": true
+            }
+        },
+        "licenseType": "Windows_Client",
+        "priority": "Spot",
+        "evictionPolicy": "Deallocate",
+        "billingProfile": {
+            "maxPrice": -1
+        }
+    },
+    "zones": [
+        "2"
+    ],
+    "resources": [
+        {
+            "name": "CustomScriptExtension",
+            "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/VM2/extensions/CustomScriptExtension",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "eastus",
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "provisioningState": "Succeeded",
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "settings": {
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command \"Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer -All\""
+                }
+            }
+        }
+    ]
+}
