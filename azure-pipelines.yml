@@ -1,14 +1,11 @@
-trigger:
-  - main
-
 jobs:
 - job: TestKeyVaultAccess
   pool:
-    name: 'Azure Pipelines' 
+    name: Azure Pipelines  # Spécifiez le nom du pool ici
   steps:
   - task: AzureKeyVault@2
     inputs:
       azureSubscription: 'AzureKeyVaultConnection'
-      KeyVaultName: 'KeyVaultPremierProjet' 
+      KeyVaultName: 'KeyVaultPremierProjet'
       SecretsFilter: '*'
       RunAsPreJob: false
