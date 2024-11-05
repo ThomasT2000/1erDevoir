@@ -1,14 +1,14 @@
 trigger:
-  - main # ou la branche de votre choix
+  - main
 
 jobs:
 - job: TestKeyVaultAccess
   pool:
-    vmImage: 'ubuntu-latest' # ou un autre agent de votre choix
+    name: 'Azure Pipelines' 
   steps:
   - task: AzureKeyVault@2
     inputs:
-      azureSubscription: 'AzureKeyVaultConnection' 
+      azureSubscription: 'AzureKeyVaultConnection'
       KeyVaultName: 'KeyVaultPremierProjet' 
-      SecretsFilter: '*' 
+      SecretsFilter: '*'
       RunAsPreJob: false
