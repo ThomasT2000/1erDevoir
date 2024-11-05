@@ -6,81 +6,45 @@
       "value": "canadacentral"
     },
     "osDiskType": {
-      "value": "StandardSSD_LRS"
+      "value": "Premium_LRS"
     },
     "virtualNetworkId": {
-      "value": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/virtualNetworks/vnet-canadacentral"
+      "value": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/virtualNetworks/Vlan"
     },
     "virtualNetworkName": {
-      "value": "vnet-canadacentral"
+      "value": "Vlan"
     },
     "networkSecurityGroups": {
       "value": [
         {
-          "name": "basicNsgvnet-canadacentral-nic01",
-          "id": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgvnet-canadacentral-nic01",
-          "rules": [
-            {
-              "name": "Tcp",
-              "properties": {
-                "priority": 300,
-                "protocol": "Tcp",
-                "access": "Allow",
-                "direction": "Inbound",
-                "sourceAddressPrefix": "*",
-                "sourcePortRange": "*",
-                "destinationAddressPrefix": "*",
-                "destinationPortRange": "80"
-              }
-            }
-          ]
+          "name": "basicNsgVlan-nic01",
+          "id": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgVlan-nic01",
+          "rules": []
         }
       ]
     },
     "networkInterfaceConfigurations": {
       "value": [
         {
-          "name": "vnet-canadacentral-nic01",
+          "name": "Vlan-nic01",
           "primary": true,
-          "subnetId": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/virtualNetworks/vnet-canadacentral/subnets/snet-canadacentral-1",
+          "subnetId": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/virtualNetworks/Vlan/subnets/default",
           "applicationGatewayBackendAddressPools": [],
-          "loadBalancerBackendAddressPools": [
-            {
-              "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancerName'), parameters('backendPoolName'))]"
-            }
-          ],
+          "loadBalancerBackendAddressPools": [],
           "applicationSecurityGroups": [],
           "loadBalancerInboundNatPools": [],
           "enableAcceleratedNetworking": false,
-          "nsgName": "basicNsgvnet-canadacentral-nic01",
-          "nsgId": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgvnet-canadacentral-nic01",
-          "pipName": "publicIp-vnet-canadacentral-nic01"
+          "nsgName": "basicNsgVlan-nic01",
+          "nsgId": "/subscriptions/f443ea42-ca4a-48d5-98a1-a7358351cec3/resourceGroups/Thom_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgVlan-nic01",
+          "pipName": "publicIp-Vlan-nic01"
         }
       ]
     },
-    "backendPoolName": {
-      "value": "bepool"
-    },
-    "loadBalancerName": {
-      "value": "ALB"
-    },
-    "loadbalancingRuleFrontEndPort": {
-      "value": 80
-    },
-    "loadbalancingRuleBackendEndPort": {
-      "value": 80
-    },
-    "loadbalancingRuleProtocol": {
-      "value": "Tcp"
-    },
-    "InboundNATRuleFrontEndPortRangeStart": {
-      "value": 50000
-    },
     "vmName": {
-      "value": "VMss1"
+      "value": "VMSS-1erDevoir"
     },
     "virtualMachineScaleSetName": {
-      "value": "VMss1"
+      "value": "VMSS-1erDevoir"
     },
     "instanceCount": {
       "value": "2"
@@ -111,36 +75,6 @@
     "adminPassword": {
       "value": null
     },
-    "customData": {
-      "value": null
-    },
-    "securityType": {
-      "value": "TrustedLaunch"
-    },
-    "secureBoot": {
-      "value": true
-    },
-    "vTPM": {
-      "value": true
-    },
-    "healthExtensionProtocol": {
-      "value": "http"
-    },
-    "healthExtensionPort": {
-      "value": 80
-    },
-    "healthExtensionRequestPath": {
-      "value": "/"
-    },
-    "autoRepairsPolicyEnabled": {
-      "value": false
-    },
-    "gracePeriod": {
-      "value": "PT10M"
-    },
-    "autoRepairsAction": {
-      "value": "Replace"
-    },
     "vnetLocation": {
       "value": "canadacentral"
     },
@@ -148,13 +82,53 @@
       "value": {}
     },
     "vnetVirtualNetworkName": {
-      "value": "vnet-canadacentral"
+      "value": "Vlan"
     },
-    "vnetResourceGroupName": {
-      "value": "Thom_RG"
+    "vnetTagsByResource": {
+      "value": {}
     },
-    "vnetDeploymentName": {
-      "value": "network-interface-associated-virtual-network-20241103151913"
+    "vnetProperties": {
+      "value": {
+        "provisioningState": "Succeeded",
+        "resourceGuid": "6aa38750-86e1-4b94-b543-8056f507f814",
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "provisioningState": "Succeeded",
+              "addressPrefix": "10.0.0.0/24",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "provisioningState": "Succeeded",
+              "addressPrefix": "10.0.200.0/26",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "snet-canadacentral-1",
+            "properties": {
+              "addressPrefixes": [
+                "10.0.1.0/24"
+              ]
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false
+      }
     },
     "vnetNatGatewaysWithNewPublicIpAddress": {
       "value": []
@@ -168,24 +142,11 @@
     "vnetNetworkSecurityGroupsNew": {
       "value": []
     },
-    "vnetProperties": {
-      "value": {
-        "subnets": [
-          {
-            "name": "snet-canadacentral-1",
-            "properties": {
-              "addressPrefixes": [
-                "172.16.0.0/24"
-              ]
-            }
-          }
-        ],
-        "addressSpace": {
-          "addressPrefixes": [
-            "172.16.0.0/16"
-          ]
-        }
-      }
+    "vnetResourceGroupName": {
+      "value": "Thom_RG"
+    },
+    "vnetDeploymentName": {
+      "value": "network-interface-associated-virtual-network-20241104191856"
     }
   }
 }
