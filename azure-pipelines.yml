@@ -1,7 +1,7 @@
 jobs:
 - job: TestKeyVaultAccess
   pool:
-    name: Azure Pipelines  # Spécifiez le nom du pool ici
+    name: Agent
   steps:
   - task: AzureKeyVault@2
     inputs:
