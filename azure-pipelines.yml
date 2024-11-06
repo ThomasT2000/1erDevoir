@@ -1,11 +1,32 @@
+# azure-pipelines.yml
+
+trigger:
+- main # Remplace par la branche que tu veux déclencher
+
+pool:
+  vmImage: 'ubuntu-latest' # Utilise une image Ubuntu, tu peux changer si nécessaire
+
+variables:
+  keyVaultName: 'KeyVaultPremierProjet'
+  secretName: 'MotDePasseVM1'
+  serviceConnection: 'AzureKeyVaultConnection'
+
 jobs:
 - job: TestKeyVaultAccess
-  pool:
-    name: Agent
+  displayName: 'Test Access to Key Vault'
   steps:
-  - task: AzureKeyVault@2
+  - task: AzureCLI@2
     inputs:
-      azureSubscription: 'AzureKeyVaultConnection'
-      KeyVaultName: 'KeyVaultPremierProjet'
-      SecretsFilter: '*'
-      RunAsPreJob: false
+      azureSubscription: $(serviceConnection)
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        echo "Testing access to Key Vault: $keyVaultName"
+        secret=$(az keyvault secret show --name $secretName --vault-name $keyVaultName --query value -o tsv)
+        
+        if [ $? -eq 0 ]; then
+          echo "Successfully accessed the secret: $secret"
+        else
+          echo "Failed to access the secret."
+          exit 1
+        fi
