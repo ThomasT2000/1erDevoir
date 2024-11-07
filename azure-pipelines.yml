@@ -4,7 +4,7 @@ trigger:
 - main # Remplace par la branche que tu veux déclencher
 
 pool:
-  name: 'Azure Pipelines' # Assure-toi que le pool d'agents auto-hébergés est spécifié ici
+  name: 'Agent' # Assure-toi que le pool d'agents auto-hébergés est spécifié ici
 
 variables:
   keyVaultName: 'KeyVaultPremierProjet'
