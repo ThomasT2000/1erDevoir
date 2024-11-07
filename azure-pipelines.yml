@@ -1,10 +1,10 @@
 # azure-pipelines.yml
 
 trigger:
-- main # Remplace par la branche que tu veux déclencher
+- main  
 
 pool:
-  name: 'Agent' # Assure-toi que le pool d'agents auto-hébergés est spécifié ici
+  name: 'Agent'  
 
 variables:
   keyVaultName: 'KeyVaultPremierProjet'
@@ -17,11 +17,26 @@ jobs:
   steps:
   - task: AzureCLI@2
     inputs:
-      azureSubscription: $(serviceConnection)
+      azureSubscription: $(serviceConnection)  # Utilisation de la connexion de service configurée dans Azure DevOps
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
-        echo "Testing access to Key Vault: $keyVaultName"
+        echo "Starting Azure CLI script to test Key Vault access"
+        
+        # Affichage des informations de connexion pour debugging
+        echo "Attempting to login with Azure CLI"
+        
+        # Vérifie si le login est effectué correctement
+        az account show
+        
+        if [ $? -ne 0 ]; then
+          echo "Azure CLI login failed."
+          exit 1
+        fi
+
+        echo "Logged in successfully. Now testing access to Key Vault: $keyVaultName"
+        
+        # Tester l'accès au Key Vault
         secret=$(az keyvault secret show --name $secretName --vault-name $keyVaultName --query value -o tsv)
         
         if [ $? -eq 0 ]; then
