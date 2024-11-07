@@ -1,0 +1,82 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  keyVaultName: 'KeyVaultPremierProjet'
+  azureSubscription: '<Nom-de-la-connexion-de-service-Azure>'
+  resourceGroupName: 'vm-loadbalancer-rg'
+  location: 'East US'
+  templateFile: 'templates/deployment-template.json'
+  parametersFile: 'templates/deployment-parameters.json'
+
+stages:
+  - stage: Validation
+    displayName: 'Validation des fichiers de configuration et des scripts'
+    jobs:
+      - job: ValidateConfigs
+        displayName: "Validation des fichiers JSON et du script de mise à l'échelle"
+        steps:
+          - script: |
+              echo "Validation du fichier VM1.json"
+              powershell -Command "Get-Content $(vm1Json) | ConvertFrom-Json" || exit 1
+            displayName: "Validation de VM1.json"
+
+          - script: |
+              echo "Validation du fichier VM2.json"
+              powershell -Command "Get-Content $(vm2Json) | ConvertFrom-Json" || exit 1
+            displayName: "Validation de VM2.json"
+
+          - script: |
+              echo "Validation du fichier webscalteset.json"
+              powershell -Command "Get-Content $(webscaleJson) | ConvertFrom-Json" || exit 1
+            displayName: "Validation de webscalteset.json"
+
+          - script: |
+              echo "Validation du script Mise_a_echelle.sh"
+              bash -n Mise_a_echelle.sh || exit 1
+            displayName: "Validation du script de mise à l'échelle"
+
+          - script: |
+              echo "Vérification du fichier README.md"
+              if [[ ! -s README.md ]]; then
+                echo "Erreur : le fichier README.md est vide ou non renseigné." && exit 1
+              fi
+            displayName: "Vérification du contenu du README.md"
+
+  - stage: DeployInfrastructure
+    displayName: "Déployer l'infrastructure Azure"
+    jobs:
+      - job: DeployResources
+        displayName: "Déployer les VMs et Load Balancer"
+        steps:
+          - checkout: self
+
+          # Récupération du mot de passe administrateur depuis Azure Key Vault
+          - task: AzureKeyVault@2
+            inputs:
+              azureSubscription: $(azureSubscription)
+              KeyVaultName: $(keyVaultName)
+              SecretsFilter: 'adminPassword'
+              RunAsPreJob: true
+
+          # Déploiement avec Azure CLI
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Création du groupe de ressources $(resourceGroupName)"
+                az group create --name $(resourceGroupName) --location $(location)
+
+                echo "Déploiement des machines virtuelles et du Load Balancer"
+                az deployment group create \
+                  --resource-group $(resourceGroupName) \
+                  --template-file $(templateFile) \
+                  --parameters @$(parametersFile) \
+                  --parameters adminPassword="$(adminPassword)"
