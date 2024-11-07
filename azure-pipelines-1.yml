@@ -1,19 +1,52 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main  # Ce pipeline se déclenche à chaque commit sur la branche principale
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'Agent'  # Agent auto-hébergé nommé 'Agent'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  keyVaultName: 'KeyVaultPremierProjet'
+  vm1Json: 'VM1.json'
+  vm2Json: 'VM2.json'
+  webscaleJson: 'webscalteset.json'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: Validation
+  displayName: 'Validation des fichiers de configuration et des scripts'
+  jobs:
+    - job: ValidateConfigs
+      displayName: "Validation des fichiers JSON et du script de mise à l'échelle"
+      steps:
+        # Étape 1: Validation du fichier JSON pour VM1
+        - script: |
+            echo "Validation du fichier VM1.json"
+            jq empty $(vm1Json) || exit 1  # Vérifie la syntaxe JSON pour VM1
+          displayName: "Validation de VM1.json"
+
+        # Étape 2: Validation du fichier JSON pour VM2
+        - script: |
+            echo "Validation du fichier VM2.json"
+            jq empty $(vm2Json) || exit 1  # Vérifie la syntaxe JSON pour VM2
+          displayName: "Validation de VM2.json"
+
+        # Étape 3: Validation du fichier JSON pour Web Scale Set
+        - script: |
+            echo "Validation du fichier webscalteset.json"
+            jq empty $(webscaleJson) || exit 1  # Vérifie la syntaxe JSON pour le Web Scale Set
+          displayName: "Validation de webscalteset.json"
+
+        # Étape 4: Validation du script Mise_a_echelle.sh
+        - script: |
+            echo "Validation du script Mise_a_echelle.sh"
+            bash -n Mise_a_echelle.sh || exit 1  # Vérifie la syntaxe du script Bash
+          displayName: "Validation du script de mise à l'échelle"
+
+        # Étape 5: Vérification du fichier README.md
+        - script: |
+            echo "Vérification du fichier README.md"
+            if [[ ! -s README.md ]]; then
+              echo "Erreur : le fichier README.md est vide ou non renseigné." && exit 1
+            fi
+          displayName: "Vérification du contenu du README.md"
