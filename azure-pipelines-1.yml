@@ -1,10 +1,10 @@
 trigger:
   branches:
     include:
-      - main  # Ce pipeline se déclenche à chaque commit sur la branche principale
+      - main
 
 pool:
-  name: 'Agent'  # Agent auto-hébergé nommé 'Agent'
+  name: 'Agent' #nom de l'agent auto-hébergé
 
 variables:
   keyVaultName: 'KeyVaultPremierProjet'
@@ -22,19 +22,19 @@ stages:
         # Étape 1: Validation du fichier JSON pour VM1
         - script: |
             echo "Validation du fichier VM1.json"
-            jq empty $(vm1Json) || exit 1  # Vérifie la syntaxe JSON pour VM1
+            powershell -Command "Get-Content $(vm1Json) | ConvertFrom-Json" || exit 1
           displayName: "Validation de VM1.json"
 
         # Étape 2: Validation du fichier JSON pour VM2
         - script: |
             echo "Validation du fichier VM2.json"
-            jq empty $(vm2Json) || exit 1  # Vérifie la syntaxe JSON pour VM2
+            powershell -Command "Get-Content $(vm2Json) | ConvertFrom-Json" || exit 1
           displayName: "Validation de VM2.json"
 
         # Étape 3: Validation du fichier JSON pour Web Scale Set
         - script: |
             echo "Validation du fichier webscalteset.json"
-            jq empty $(webscaleJson) || exit 1  # Vérifie la syntaxe JSON pour le Web Scale Set
+            powershell -Command "Get-Content $(webscaleJson) | ConvertFrom-Json" || exit 1
           displayName: "Validation de webscalteset.json"
 
         # Étape 4: Validation du script Mise_a_echelle.sh
