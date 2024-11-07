@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vm1Name": { "value": "myVM1" },
+    "vm2Name": { "value": "myVM2" },
+    "adminUsername": { "value": "azureuser" },
+    "adminPassword": { "value": "" }  // Laissez vide ici pour utiliser Key Vault dans le pipeline
+  }
+}
