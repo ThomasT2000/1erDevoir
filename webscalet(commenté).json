@@ -1,0 +1,68 @@
+{
+    # Structure de base de la VM
+    "name": "WebScaleSet_aa7c5da3",
+    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/WebScaleSet_aa7c5da3",
+    "type": "Microsoft.Compute/virtualMachines",
+    "location": "eastus",
+    "tags": {
+        "VirtualMachineProfileTimeCreated": "11/5/2024 9:04:54 PM +00:00"
+    },
+    "properties": { # Détails sur les propriétés de la VM
+        "hardwareProfile": {
+            "vmSize": "Standard_DC1s_v2"
+        },
+        "provisioningState": "Succeeded",
+        "vmId": "8916df50-519a-4a07-88d3-62fdd0f42f16",
+        "virtualMachineScaleSet": { # Référence au scale set auquel cette VM appartient
+            "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachineScaleSets/WebScaleSet"
+        },
+        "storageProfile": { # Information de stockage de la VM
+            "imageReference": {
+                "publisher": "MicrosoftWindowsServer",
+                "offer": "WindowsServer",
+                "sku": "2019-datacenter-gensecond",
+                "version": "latest",
+                "exactVersion": "17763.6414.241004"
+            },
+            "osDisk": { # Paremètres pour le disque système de la VM
+                "osType": "Windows", # Système d'exploitation
+                "name": "WebScaleSet_aa7c5da3_OsDisk_1_4026e81a28214c79b7c442693acbc67e", # Nom du disque système
+                "createOption": "FromImage", #Méthode de création du disque
+                "caching": "ReadWrite", # Mode de cache
+                "managedDisk": { # Informations sur le disque géré
+                    "storageAccountType": "Premium_LRS", # Type de stockage
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/disks/WebScaleSet_aa7c5da3_OsDisk_1_4026e81a28214c79b7c442693acbc67e"
+                },
+                "deleteOption": "Delete", # Le disque est supprimé avec la VM
+                "diskSizeGB": 127 # Taille du disque
+            },
+            "dataDisks": []
+        },
+        "osProfile": { # Informations sur le profil système de la VM
+            "computerName": "WebScaleNQ6DZX", # Nom de l'ordinateur dans le scale
+            "adminUsername": "azureUser",
+            "windowsConfiguration": { # Configuration spécifique à Windows
+                "provisionVMAgent": true, # Active l'agent de provisionnement de la VM, permettant les extensions
+                "enableAutomaticUpdates": true, # Active les mises à jour automatiques
+                "patchSettings": { # Configuration des mises à jour
+                    "patchMode": "AutomaticByOS", # Mode de mise à jour
+                    "assessmentMode": "ImageDefault"
+                }
+            },
+            "secrets": [],
+            "allowExtensionOperations": true,
+            "requireGuestProvisionSignal": true
+        },
+        "networkProfile": { # Interfaces réseau associées à la VM 
+            "networkInterfaces": [
+                {
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/webscdc08Nic-9e4783fa",
+                    "properties": {
+                        "primary": true,
+                        "deleteOption": "Delete"
+                    }
+                }
+            ]
+        }
+    }
+}
