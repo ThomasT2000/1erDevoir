@@ -4,9 +4,8 @@ trigger:
     include:
       - main
 
-# Spécifie l'agent à utiliser pour le pipeline
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
 # Déclaration des variables globales
 variables:
