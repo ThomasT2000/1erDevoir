@@ -27,17 +27,17 @@ stages:
         steps:
           - script: |
               echo "Validation du fichier VM1.json"
-              Get-Content $(vm1Json) | ConvertFrom-Json || exit 1
+              powershell -Command "Get-Content '$(vm1Json)' | ConvertFrom-Json" || exit 1
             displayName: "Validation de VM1.json"
           
           - script: |
               echo "Validation du fichier VM2.json"
-              Get-Content $(vm2Json) | ConvertFrom-Json || exit 1
+              powershell -Command "Get-Content '$(vm2Json)' | ConvertFrom-Json" || exit 1
             displayName: "Validation de VM2.json"
           
           - script: |
               echo "Validation du fichier webscalteset.json"
-              Get-Content $(webscaleJson) | ConvertFrom-Json || exit 1
+              powershell -Command "Get-Content '$(webscaleJson)' | ConvertFrom-Json" || exit 1
             displayName: "Validation de webscalteset.json"
           
           - script: |
