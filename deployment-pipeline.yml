@@ -51,10 +51,10 @@ stages:
           # Vérification du fichier README.md
           - script: |
               echo "Vérification du fichier README.md"
-              if [[ ! -s README.md ]]; then
-                echo "Erreur : le fichier README.md est vide ou non renseigné." && exit 1
-              fi
+              powershell -Command "if ((Get-Content README.md | Measure-Object -Line).Lines -eq 0) { Write-Output 'Erreur : le fichier README.md est vide.'; exit 1 }"
             displayName: "Vérification du contenu du README.md"
+
+
 
   # Étape de déploiement des ressources dans Azure
   - stage: DeployInfrastructure
