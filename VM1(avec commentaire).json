@@ -1,0 +1,102 @@
+{
+    # Structure principale de la VM
+    "name": "VM1",
+    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/VM1",
+    "type": "Microsoft.Compute/virtualMachines",
+    "location": "eastus",
+    "tags": {
+        "VM1": ""
+    },
+    # Détails des paramètres de la VM
+    "properties": {
+        "hardwareProfile": { # Taille de la VM
+            "vmSize": "Standard_DC1s_v2"
+        },
+        "provisioningState": "Succeeded", # VM prête à l'emploi
+        "vmId": "a46277c6-8bc3-4834-ae1b-4473be3a7aaf",
+        "additionalCapabilities": {
+            "hibernationEnabled": false
+        },
+        "storageProfile": { # Information de stockage de la VM
+            "imageReference": {
+                "publisher": "MicrosoftWindowsDesktop",
+                "offer": "Windows-10",
+                "sku": "win10-22h2-pro-g2",
+                "version": "latest",
+                "exactVersion": "19045.5011.241005"
+            },
+            "osDisk": { # Paramètre du disque système
+                "osType": "Windows",
+                "name": "VM1_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9",
+                "createOption": "FromImage",
+                "caching": "ReadWrite",
+                "managedDisk": {
+                    "storageAccountType": "Premium_LRS",
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/disks/VM1_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9"
+                },
+                "deleteOption": "Delete",
+                "diskSizeGB": 127
+            },
+            "dataDisks": []
+        },
+        "osProfile": { #Information sur le profil système d'exploitation de la VM
+            "computerName": "VM1",
+            "adminUsername": "userazure",
+            "windowsConfiguration": {
+                "provisionVMAgent": true,
+                "enableAutomaticUpdates": true,
+                "patchSettings": {
+                    "patchMode": "AutomaticByOS",
+                    "assessmentMode": "ImageDefault",
+                    "enableHotpatching": false
+                }
+            },
+            "secrets": [],
+            "allowExtensionOperations": true,
+            "requireGuestProvisionSignal": true
+        },
+        "networkProfile": { # Interfaces réseau associées à la VM
+            "networkInterfaces": [
+                {
+                    "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm1504_z1",
+                    "properties": {
+                        "deleteOption": "Detach"
+                    }
+                }
+            ]
+        },
+        "diagnosticsProfile": { 
+            "bootDiagnostics": {
+                "enabled": true
+            }
+        },
+        # Type de licence
+        "licenseType": "Windows_Client",
+        "priority": "Spot",
+        "evictionPolicy": "Deallocate",
+        "billingProfile": {
+            "maxPrice": -1
+        }
+    },
+    "zones": [ # Zone de disponibilité 
+        "1"
+    ],
+    "resources": [ #Extension de la VM
+        {
+            "name": "CustomScriptExtension",
+            "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/VM1/extensions/CustomScriptExtension",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "eastus",
+            "properties": {
+                "autoUpgradeMinorVersion": true, # Met automatiquement à jour l'extension aux nouvelles versions mineures
+                "provisioningState": "Succeeded", # Extension correctement appliquée
+                "publisher": "Microsoft.Compute", # Fournisseur d'extension
+                "type": "CustomScriptExtension", # Type et version de l'extension
+                "typeHandlerVersion": "1.10",
+                "settings": {
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command \"Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer -All\""
+                }
+            }
+        }
+    ]
+}
