@@ -1,22 +1,23 @@
-# Déclenchement automatique sur la branche principale
 trigger:
   branches:
     include:
       - main
 
 pool:
-  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
+  name: 'Agent'
 
-# Déclaration des variables globales
 variables:
-  keyVaultName: 'KeyVaultPremierProjet'  # Nom du Key Vault où sont stockés les mots de passe
-  azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service Azure
-  resourceGroupName: 'vm-loadbalancer-rg'  # Nom du groupe de ressources
-  location: 'East US'  # Région Azure
-  templateFile: 'templates/deployment-template.json'  # Chemin du fichier de template ARM
-  parametersFile: 'templates/deployment-parameters.json'  # Chemin du fichier des paramètres ARM
+  keyVaultName: 'KeyVaultPremierProjet'
+  azureSubscription: 'AzureKeyVaultConnection'
+  resourceGroupName: 'vm-loadbalancer-rg'
+  location: 'East US'
+  templateFile: 'templates/deployment-template.json'
+  parametersFile: 'templates/deployment-parameters.json'
+  # Ajout des chemins pour les fichiers JSON
+  vm1Json: 'path/to/VM1.json'
+  vm2Json: 'path/to/VM2.json'
+  webscaleJson: 'path/to/webscalteset.json'
 
-# Étape de validation des fichiers de configuration et du script
 stages:
   - stage: Validation
     displayName: 'Validation des fichiers de configuration et des scripts'
@@ -24,31 +25,26 @@ stages:
       - job: ValidateConfigs
         displayName: "Validation des fichiers JSON et du script de mise à l'échelle"
         steps:
-          # Validation de VM1.json
           - script: |
               echo "Validation du fichier VM1.json"
-              powershell -Command "Get-Content $(vm1Json) | ConvertFrom-Json" || exit 1
+              Get-Content $(vm1Json) | ConvertFrom-Json || exit 1
             displayName: "Validation de VM1.json"
-
-          # Validation de VM2.json
+          
           - script: |
               echo "Validation du fichier VM2.json"
-              powershell -Command "Get-Content $(vm2Json) | ConvertFrom-Json" || exit 1
+              Get-Content $(vm2Json) | ConvertFrom-Json || exit 1
             displayName: "Validation de VM2.json"
-
-          # Validation du fichier de Web Scale Set
+          
           - script: |
               echo "Validation du fichier webscalteset.json"
-              powershell -Command "Get-Content $(webscaleJson) | ConvertFrom-Json" || exit 1
+              Get-Content $(webscaleJson) | ConvertFrom-Json || exit 1
             displayName: "Validation de webscalteset.json"
-
-          # Validation du script Bash Mise_a_echelle.sh
+          
           - script: |
               echo "Validation du script Mise_a_echelle.sh"
               bash -n Mise_a_echelle.sh || exit 1
             displayName: "Validation du script de mise à l'échelle"
 
-          # Vérification du fichier README.md
           - script: |
               echo "Vérification du fichier README.md"
               if [[ ! -s README.md ]]; then
@@ -56,25 +52,20 @@ stages:
               fi
             displayName: "Vérification du contenu du README.md"
 
-  # Étape de déploiement des ressources dans Azure
   - stage: DeployInfrastructure
     displayName: "Déployer l'infrastructure Azure"
     jobs:
       - job: DeployResources
         displayName: "Déployer les VMs et Load Balancer"
         steps:
-          # Étape 1 : Récupérer les fichiers depuis le dépôt GitHub
           - checkout: self
-
-          # Étape 2 : Récupération du mot de passe administrateur depuis le Key Vault
           - task: AzureKeyVault@2
             inputs:
               azureSubscription: $(azureSubscription)
               KeyVaultName: $(keyVaultName)
-              SecretsFilter: 'adminPassword'  # Le secret adminPassword doit être défini dans le Key Vault
-              RunAsPreJob: true  # Le mot de passe sera disponible pour les étapes suivantes
+              SecretsFilter: 'adminPassword'
+              RunAsPreJob: true
 
-          # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureSubscription)
