@@ -58,9 +58,11 @@ stages:
           displayName: "Validation du script de mise à l'échelle"
 
         # Étape 7: Vérification du fichier README.md
-        - script: |
-            echo "Vérification du fichier README.md"
-            if [[ ! -s README.md ]]; then
-              echo "Erreur : le fichier README.md est vide ou non renseigné." && exit 1
-            fi
+        - powershell: |
+            Write-Output "Vérification du fichier README.md"
+            if ((Get-Item README.md).length -eq 0) {
+              Write-Output "Erreur : le fichier README.md est vide ou non renseigné." 
+              exit 1
+            }
           displayName: "Vérification du contenu du README.md"
+
