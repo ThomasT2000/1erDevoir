@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vm1Name": {
+      "value": "VM1"
+    },
+    "vm2Name": {
+      "value": "VM2"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "adminUsername": {
+      "value": "userazure"
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+        },
+        "secretName": "adminPassword"
+      }
+    },
+    "vmSize": {
+      "value": "Standard_DC1s_v2"
+    },
+    "vm1OsDiskName": {
+      "value": "VM1_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9"
+    },
+    "vm2OsDiskName": {
+      "value": "VM2_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9"
+    },
+    "vm1NetworkInterfaceId": {
+      "value": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm1504_z1"
+    },
+    "vm2NetworkInterfaceId": {
+      "value": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm2504_z1"
+    },
+    "imagePublisher": {
+      "value": "MicrosoftWindowsDesktop"
+    },
+    "imageOffer": {
+      "value": "Windows-10"
+    },
+    "imageSku": {
+      "value": "win10-22h2-pro-g2"
+    },
+    "imageVersion": {
+      "value": "latest"
+    },
+    "priority": {
+      "value": "Spot"
+    },
+    "evictionPolicy": {
+      "value": "Deallocate"
+    },
+    "licenseType": {
+      "value": "Windows_Client"
+    }
+  }
+}
+

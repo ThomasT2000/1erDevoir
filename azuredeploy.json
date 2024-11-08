@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2022-05-01",
+      "name": "MyLoadBalancer",
+      "location": "eastus",
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "publicIPAddress": {
+                "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "LoadBalancerBackEnd",
+            "properties": {
+              "virtualMachineScaleSet": {
+                "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachineScaleSets/WebScaleSet"
+              }
+            }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "HTTPRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', 'MyLoadBalancer', 'LoadBalancerFrontEnd')]"
+              },
+              "backendAddressPool": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'MyLoadBalancer', 'LoadBalancerBackEnd')]"
+              },
+              "probe": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', 'MyLoadBalancer', 'HealthProbe')]"
+              },
+              "protocol": "Tcp",
+              "loadDistribution": "Default",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "idleTimeoutInMinutes": 4,
+              "enableFloatingIP": false
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "HealthProbe",
+            "properties": {
+              "protocol": "Http",
+              "port": 80,
+              "requestPath": "/",
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-05-01",
+      "name": "vm1504_z1",
+      "location": "eastus",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'MyLoadBalancer', 'LoadBalancerBackEnd')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-05-01",
+      "name": "vm2504_z1",
+      "location": "eastus",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'MyLoadBalancer', 'LoadBalancerBackEnd')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
