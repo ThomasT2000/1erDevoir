@@ -27,19 +27,19 @@ stages:
           # Validation de VM1.json
           - script: |
               echo "Validation du fichier VM1.json"
-              pwsh -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM1.json' | ConvertFrom-Json" || exit 1
+              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM1.json' | ConvertFrom-Json" || exit 1
             displayName: "Validation de VM1.json"
 
           # Validation de VM2.json
           - script: |
               echo "Validation du fichier VM2.json"
-              pwsh -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM2.json' | ConvertFrom-Json" || exit 1
+              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM2.json' | ConvertFrom-Json" || exit 1
             displayName: "Validation de VM2.json"
 
           # Validation du fichier de Web Scale Set
           - script: |
               echo "Validation du fichier webscalteset.json"
-              pwsh -Command "Get-Content '$(System.DefaultWorkingDirectory)/webscalteset.json' | ConvertFrom-Json" || exit 1
+              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/webscalteset.json' | ConvertFrom-Json" || exit 1
             displayName: "Validation de webscalteset.json"
 
           # Validation du script Bash Mise_a_echelle.sh
