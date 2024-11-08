@@ -1,16 +1,18 @@
 trigger:
   branches:
     include:
-      - main
+      - main  # Déclencher le pipeline CI uniquement sur la branche 'main'
 
 pool:
-  name: 'Agent' #nom de l'agent auto-hébergé
+  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
 variables:
   keyVaultName: 'KeyVaultPremierProjet'
   vm1Json: 'VM1.json'
   vm2Json: 'VM2.json'
   webscaleJson: 'webscalteset.json'
+  azureDeployJson: 'azuredeploy.json'
+  azureDeployParamsJson: 'azuredeploy.parameters.json'
 
 stages:
 - stage: Validation
@@ -37,13 +39,25 @@ stages:
             powershell -Command "Get-Content $(webscaleJson) | ConvertFrom-Json" || exit 1
           displayName: "Validation de webscalteset.json"
 
-        # Étape 4: Validation du script Mise_a_echelle.sh
+        # Étape 4: Validation du fichier JSON pour azuredeploy.json
+        - script: |
+            echo "Validation du fichier azuredeploy.json"
+            powershell -Command "Get-Content $(azureDeployJson) | ConvertFrom-Json" || exit 1
+          displayName: "Validation de azuredeploy.json"
+
+        # Étape 5: Validation du fichier JSON pour azuredeploy.parameters.json
+        - script: |
+            echo "Validation du fichier azuredeploy.parameters.json"
+            powershell -Command "Get-Content $(azureDeployParamsJson) | ConvertFrom-Json" || exit 1
+          displayName: "Validation de azuredeploy.parameters.json"
+
+        # Étape 6: Validation du script Mise_a_echelle.sh
         - script: |
             echo "Validation du script Mise_a_echelle.sh"
             bash -n Mise_a_echelle.sh || exit 1  # Vérifie la syntaxe du script Bash
           displayName: "Validation du script de mise à l'échelle"
 
-        # Étape 5: Vérification du fichier README.md
+        # Étape 7: Vérification du fichier README.md
         - script: |
             echo "Vérification du fichier README.md"
             if [[ ! -s README.md ]]; then
