@@ -19,7 +19,7 @@ stages:
             inlineScript: |
               # Validation du template ARM avec PowerShell
               az deployment group validate `
-                --resource-group 8CLD201_Devoir1_Infra `
+                --resource-group KeyVaultGroup `
                 --template-file azuredeploy.json `
                 --parameters azuredeploy.parameters.json
               
