@@ -9,7 +9,7 @@ stages:
     - job: ARMTemplateValidation
       displayName: "Compilation et validation du template ARM"
       pool:
-        name: 'Azure Pipelines'
+        name: 'Agent'
       steps:
         - task: AzureCLI@2
           inputs:
