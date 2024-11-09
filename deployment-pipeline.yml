@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - main  # Exécuter le pipeline à chaque commit sur la branche principale
 
 stages:
 - stage: CompileAndValidate
@@ -9,20 +9,20 @@ stages:
     - job: ARMTemplateValidation
       displayName: "Compilation et validation du template ARM"
       pool:
-        name: 'Agent'  # Utiliser l'agent auto-hébergé Windows
+        name: 'Agent'  # Utiliser l'agent Azure Pipelines par défaut
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Utiliser la connexion de service Azure
+            azureSubscription: 'AzureKeyVaultConnection'  # Connexion au service Azure
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # Validation du template ARM avec PowerShell
+              # Validation du template ARM
               az deployment group validate `
                 --resource-group KeyVaultGroup `
                 --template-file azuredeploy.json `
                 --parameters azuredeploy.parameters.json
-              
+
 - stage: DeployToAzure
   jobs:
     - job: DeployARMTemplate
@@ -33,11 +33,11 @@ stages:
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
             deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
+            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure DevOps
             subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de l'abonnement Azure
             action: 'Create Or Update Resource Group'
-            resourceGroupName: 'KeyVaultGroup'
-            location: 'Canada Central'
+            resourceGroupName: 'KeyVaultGroup'  # Nom du groupe de ressources
+            location: 'Canada Central'  # Région Azure
             templateLocation: 'Linked artifact'
-            csmFile: 'azuredeploy.json'  # Chemin du fichier template ARM
-            csmParametersFile: 'azuredeploy.parameters.json'  # Chemin du fichier paramètres du template ARM
+            csmFile: 'azuredeploy.json'  # Chemin vers le fichier template ARM
+            csmParametersFile: 'azuredeploy.parameters.json'  # Chemin vers le fichier des paramètres
