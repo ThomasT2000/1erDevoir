@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  name: 'Agent'  # Utilisation de ton agent auto-hébergé
+  name: 'Agent'  # Utilisation de agent auto-hébergé
 
 stages:
 - stage: CompileAndValidate
@@ -21,9 +21,9 @@ stages:
             scriptLocation: 'inlineScript'
             inlineScript: |
               # Validation du template ARM avec PowerShell
-              az deployment group validate 
-                --resource-group 8CLD201_Devoir1 
-                --template-file azuredeploy.json 
+              az deployment group validate `
+                --resource-group 8CLD201_Devoir1 `
+                --template-file azuredeploy.json `
                 --parameters azuredeploy.parameters.json
               
 - stage: DeployToAzure
@@ -36,7 +36,7 @@ stages:
         - task: AzureKeyVault@2
           inputs:
             azureSubscription: 'ServiceConnection'  # Utilisation de la connexion de service
-            KeyVaultName: 'CoffreDevoir1'  # Nom de ton KeyVault
+            KeyVaultName: 'CoffreDevoir1'  # Nom KeyVault
             SecretsFilter: '*'  # Filtrer tous les secrets (Secret1, Secret2)
           
         - task: AzureResourceManagerTemplateDeployment@3
