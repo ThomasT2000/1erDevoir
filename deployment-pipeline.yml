@@ -1,43 +1,30 @@
 trigger:
   branches:
     include:
-      - main  # Exécuter le pipeline à chaque commit sur la branche principale
+      - main  # Branche principale
 
 stages:
-- stage: CompileAndValidate
-  jobs:
-    - job: ARMTemplateValidation
-      displayName: "Compilation et validation du template ARM"
-      pool:
-        name: 'Agent'  # Utilisation d'un agent Ubuntu pour exécuter le script
-      steps:
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de la connexion de service existante
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              # Validation du template ARM
-              az deployment group validate \
-                --resource-group 8CLD201_Devoir1_Infra \
-                --template-file azuredeploy.json \
-                --parameters azuredeploy.parameters.json
-
 - stage: DeployToAzure
   jobs:
     - job: DeployARMTemplate
       displayName: "Déploiement du Template ARM dans Azure"
       pool:
-        name: 'Agent'  # Toujours utiliser un agent Ubuntu ici
+        name: 'Agent'  # Agent auto-hébergé
       steps:
-        - task: AzureResourceManagerTemplateDeployment@3
+        - task: AzureCLI@2
           inputs:
-            deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion de service Azure utilisée pour accéder aux ressources
-            subscriptionId: '375be4f5-a251-4fb2-8f5a-13d6f5a2cedf'  # Remplacer par votre propre subscriptionId
-            action: 'Create Or Update Resource Group'
-            resourceGroupName: '8CLD201_Devoir1_Infra'  # Nom du groupe de ressources cible
-            location: 'Canada Central'  # Localisation des ressources
-            templateLocation: 'Linked artifact'
-            csmFile: 'azuredeploy.json'
-            csmParametersFile: 'azuredeploy.parameters.json'
+            azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service Azure
+            scriptType: 'bash'  # Utilisation de bash
+            scriptLocation: 'inlineScript'  # Utilisation de script en ligne
+            inlineScript: |
+              # Exécution de la validation du template ARM
+              az deployment group validate \
+                --resource-group 8CLD201_Devoir1_Infra \
+                --template-file azuredeploy.json \
+                --parameters azuredeploy.parameters.json
+
+              # Déploiement du template
+              az deployment group create \
+                --resource-group 8CLD201_Devoir1_Infra \
+                --template-file azuredeploy.json \
+                --parameters azuredeploy.parameters.json
