@@ -5,7 +5,7 @@ trigger:
       - main
 
 pool:
-  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
+  name: 'Agent'  # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
 # Déclaration des variables globales
 variables:
@@ -54,8 +54,6 @@ stages:
               powershell -Command "if ((Get-Content README.md | Measure-Object -Line).Lines -eq 0) { Write-Output 'Erreur : le fichier README.md est vide.'; exit 1 }"
             displayName: "Vérification du contenu du README.md"
 
-
-
   # Étape de déploiement des ressources dans Azure
   - stage: DeployInfrastructure
     displayName: "Déployer l'infrastructure Azure"
@@ -73,6 +71,16 @@ stages:
               KeyVaultName: $(keyVaultName)
               SecretsFilter: 'adminPassword'  # Le secret adminPassword doit être défini dans le Key Vault
               RunAsPreJob: true  # Le mot de passe sera disponible pour les étapes suivantes
+
+          # Diagnostic pour vérifier que le mot de passe est bien récupéré
+          - script: |
+              echo "Vérification de la récupération du mot de passe adminPassword"
+              if [ -z "$(adminPassword)" ]; then
+                echo "Erreur : adminPassword n'a pas été récupéré correctement." && exit 1
+              else
+                echo "Mot de passe récupéré avec succès."
+              fi
+            displayName: "Diagnostic de adminPassword"
 
           # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
           - task: AzureCLI@2
