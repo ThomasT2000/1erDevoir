@@ -5,7 +5,7 @@ trigger:
       - main
 
 pool:
-  name: 'Agent'  # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
+  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
 # Déclaration des variables globales
 variables:
@@ -64,23 +64,20 @@ stages:
           # Étape 1 : Récupérer les fichiers depuis le dépôt GitHub
           - checkout: self
 
-          # Étape 2 : Récupération du mot de passe administrateur depuis le Key Vault
+          # Étape 2 : Récupération des mots de passe administrateurs depuis le Key Vault
           - task: AzureKeyVault@2
             inputs:
               azureSubscription: $(azureSubscription)
               KeyVaultName: $(keyVaultName)
-              SecretsFilter: 'adminPassword'  # Le secret adminPassword doit être défini dans le Key Vault
-              RunAsPreJob: true  # Le mot de passe sera disponible pour les étapes suivantes
+              SecretsFilter: 'MotDePasseVM1,MotDePasseVM2'  # Liste des secrets à récupérer
+              RunAsPreJob: true  # Les mots de passe seront disponibles pour les étapes suivantes
 
-          # Diagnostic pour vérifier que le mot de passe est bien récupéré
+          # Diagnostic pour vérifier la récupération des mots de passe
           - script: |
-              echo "Vérification de la récupération du mot de passe adminPassword"
-              if "%adminPassword%"=="" (
-                echo "Erreur : adminPassword n'a pas été récupéré correctement." && exit /b 1
-              ) else (
-                echo "Mot de passe récupéré avec succès."
-              )
-            displayName: "Diagnostic de adminPassword"
+              echo "Vérification de la récupération des mots de passe"
+              if [ -z "$(MotDePasseVM1)" ]; then echo "Erreur : MotDePasseVM1 n'a pas été récupéré."; exit 1; fi
+              if [ -z "$(MotDePasseVM2)" ]; then echo "Erreur : MotDePasseVM2 n'a pas été récupéré."; exit 1; fi
+            displayName: "Diagnostic de récupération des mots de passe"
 
           # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
           - task: AzureCLI@2
@@ -97,5 +94,5 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
                   --parameters @$(parametersFile) \
-                  --parameters adminPassword="$(adminPassword)"
+                  --parameters adminPassword="$(MotDePasseVM1)"
             displayName: "Déployer les VMs et le Load Balancer"
