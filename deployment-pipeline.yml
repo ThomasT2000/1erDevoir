@@ -34,20 +34,25 @@ stages:
               SecretsFilter: 'adminPassword'  # Le secret adminPassword doit être défini dans le Key Vault
               RunAsPreJob: true  # Le mot de passe sera disponible pour les étapes suivantes
 
-          # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
+          # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI (PowerShell)
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureSubscription)
-              scriptType: 'bash'
+              scriptType: 'pscore'  # Utilisation de PowerShell Core
               scriptLocation: 'inlineScript'
               inlineScript: |
-                echo "Création du groupe de ressources $(resourceGroupName)"
+                # Vérification du répertoire courant pour s'assurer que le script fonctionne dans le bon dossier
+                Write-Host "Répertoire de travail : $(System.DefaultWorkingDirectory)"
+                
+                # Création du groupe de ressources
+                Write-Host "Création du groupe de ressources $(resourceGroupName)"
                 az group create --name $(resourceGroupName) --location $(location)
 
-                echo "Déploiement des machines virtuelles et du Load Balancer"
-                az deployment group create \
-                  --resource-group $(resourceGroupName) \
-                  --template-file $(templateFile) \
-                  --parameters @$(parametersFile) \
-                  --parameters adminPassword="$(adminPassword)"
+                # Déploiement des ressources
+                Write-Host "Déploiement des machines virtuelles et du Load Balancer"
+                az deployment group create `
+                  --resource-group $(resourceGroupName) `
+                  --template-file $(templateFile) `
+                  --parameters @$(parametersFile) `
+                  --parameters adminPassword=$(adminPassword)
             displayName: "Déployer les VMs et le Load Balancer"
