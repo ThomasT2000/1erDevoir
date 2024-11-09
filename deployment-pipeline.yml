@@ -1,20 +1,21 @@
-# Déclenchement automatique sur la branche principale
 trigger:
   branches:
     include:
       - main
 
 pool:
-  name: 'Agent'  # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
+  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
+# Déclaration des variables globales
 variables:
-  keyVaultName: 'KeyVaultPremierProjet'
-  azureSubscription: 'AzureKeyVaultConnection'
-  resourceGroupName: 'vm-loadbalancer-rg'
-  location: 'Canada Central'
-  templateFile: 'templates/deployment-template.json'
-  parametersFile: 'templates/deployment-parameters.json'
+  keyVaultName: 'KeyVaultPremierProjet'  # Nom du Key Vault où sont stockés les mots de passe
+  azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service Azure
+  resourceGroupName: 'vm-loadbalancer-rg'  # Nom du groupe de ressources
+  location: 'Central Canada'  # Région Azure
+  templateFile: 'templates/deployment-template.json'  # Chemin du fichier de template ARM
+  parametersFile: 'templates/deployment-parameters.json'  # Chemin du fichier des paramètres ARM
 
+# Étape de déploiement des ressources dans Azure
 stages:
   - stage: DeployInfrastructure
     displayName: "Déployer l'infrastructure Azure"
@@ -22,36 +23,18 @@ stages:
       - job: DeployResources
         displayName: "Déployer les VMs et Load Balancer"
         steps:
+          # Étape 1 : Récupérer les fichiers depuis le dépôt GitHub
           - checkout: self
 
-          # Étape de récupération des secrets depuis le Key Vault
+          # Étape 2 : Récupération du mot de passe administrateur depuis le Key Vault
           - task: AzureKeyVault@2
             inputs:
               azureSubscription: $(azureSubscription)
               KeyVaultName: $(keyVaultName)
-              SecretsFilter: 'adminPassword,MotDePasseVM1,MotDePasseVM2'
+              SecretsFilter: 'adminPassword'  # Le secret adminPassword doit être défini dans le Key Vault
+              RunAsPreJob: true  # Le mot de passe sera disponible pour les étapes suivantes
 
-          # Diagnostic de récupération des mots de passe en utilisant Bash explicitement
-          - task: Bash@3
-            inputs:
-              targetType: 'inline'
-              script: |
-                echo "Vérification de la récupération des mots de passe"
-                if [ -z "$adminPassword" ]; then
-                  echo "Erreur : adminPassword n'a pas été récupéré correctement."
-                  exit 1
-                fi
-                if [ -z "$MotDePasseVM1" ]; then
-                  echo "Erreur : MotDePasseVM1 n'a pas été récupéré correctement."
-                  exit 1
-                fi
-                if [ -z "$MotDePasseVM2" ]; then
-                  echo "Erreur : MotDePasseVM2 n'a pas été récupéré correctement."
-                  exit 1
-                fi
-                echo "Tous les mots de passe ont été récupérés avec succès."
-
-          # Déploiement des ressources
+          # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureSubscription)
