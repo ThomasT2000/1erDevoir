@@ -13,7 +13,7 @@ stages:
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'AzureKeyVaultConnection' 
+            azureSubscription: 'AzureKeyVaultConnection'  # Utiliser la connexion de service Azure
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
@@ -33,11 +33,11 @@ stages:
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
             deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'
-            subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'
+            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
+            subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de l'abonnement Azure
             action: 'Create Or Update Resource Group'
             resourceGroupName: 'KeyVaultGroup'
             location: 'Canada Central'
             templateLocation: 'Linked artifact'
-            csmFile: 'azuredeploy.json'
-            csmParametersFile: 'azuredeploy.parameters.json'
+            csmFile: 'azuredeploy.json'  # Chemin du fichier template ARM
+            csmParametersFile: 'azuredeploy.parameters.json'  # Chemin du fichier paramètres du template ARM
