@@ -9,7 +9,7 @@
       "value": "VM2"
     },
     "location": {
-      "value": "eastus"
+      "value": "canadacentral"
     },
     "adminUsername": {
       "value": "userazure"
@@ -17,7 +17,7 @@
     "adminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault"
+          "id": "/subscriptions/c864c0a4-b728-49bb-bcd3-e1594c00a1c7/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault"
         },
         "secretName": "adminPassword"
       }
@@ -32,10 +32,10 @@
       "value": "VM2_OsDisk_1_326cab955bb8496f9b5bcee13a5f2ce9"
     },
     "vm1NetworkInterfaceId": {
-      "value": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm1504_z1"
+      "value": "/subscriptions/c864c0a4-b728-49bb-bcd3-e1594c00a1c7/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm1504_z1"
     },
     "vm2NetworkInterfaceId": {
-      "value": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm2504_z1"
+      "value": "/subscriptions/c864c0a4-b728-49bb-bcd3-e1594c00a1c7/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/vm2504_z1"
     },
     "imagePublisher": {
       "value": "MicrosoftWindowsDesktop"
@@ -60,4 +60,3 @@
     }
   }
 }
-
