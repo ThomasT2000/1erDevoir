@@ -9,7 +9,7 @@ stages:
     - job: ARMTemplateValidation
       displayName: "Compilation et validation du template ARM"
       pool:
-        vmImage: 'ubuntu-latest'  # Utilisation d'un agent Ubuntu pour exécuter le script
+        vmImage: 'Agent'  # Utilisation d'un agent Ubuntu pour exécuter le script
       steps:
         - task: AzureCLI@2
           inputs:
