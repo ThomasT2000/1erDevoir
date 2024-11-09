@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main  # Exécuter le pipeline à chaque commit sur la branche principale
+      - main
 
 stages:
 - stage: CompileAndValidate
@@ -9,20 +9,20 @@ stages:
     - job: ARMTemplateValidation
       displayName: "Compilation et validation du template ARM"
       pool:
-        name: 'Agent'  # Utiliser l'agent Azure Pipelines par défaut
+        name: 'Agent'  # Utiliser l'agent auto-hébergé nommé "Agent"
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Connexion au service Azure
+            azureSubscription: 'AzureKeyVaultConnection'  # Nom de la connexion de service Azure
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # Validation du template ARM
+              # Validation du template ARM avec PowerShell
               az deployment group validate `
-                --resource-group KeyVaultGroup `
+                --resource-group 8CLD201_Devoir1 `
                 --template-file azuredeploy.json `
                 --parameters azuredeploy.parameters.json
-
+              
 - stage: DeployToAzure
   jobs:
     - job: DeployARMTemplate
@@ -30,14 +30,20 @@ stages:
       pool:
         vmImage: 'ubuntu-latest'  # Utiliser un agent Ubuntu pour ce job
       steps:
+        - task: AzureKeyVault@2
+          inputs:
+            azureSubscription: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
+            KeyVaultName: 'Devoir1Key'  # Nom du KeyVault
+            SecretsFilter: 'Secret1,Secret2'  # Récupérer les secrets "Secret1" et "Secret2"
+          
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
             deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure DevOps
+            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
             subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de l'abonnement Azure
             action: 'Create Or Update Resource Group'
-            resourceGroupName: 'KeyVaultGroup'  # Nom du groupe de ressources
-            location: 'Canada Central'  # Région Azure
+            resourceGroupName: '8CLD201_Devoir1'  # Nom du groupe de ressources
+            location: 'Canada Central'
             templateLocation: 'Linked artifact'
-            csmFile: 'azuredeploy.json'  # Chemin vers le fichier template ARM
-            csmParametersFile: 'azuredeploy.parameters.json'  # Chemin vers le fichier des paramètres
+            csmFile: 'azuredeploy.json'  # Chemin du fichier template ARM
+            csmParametersFile: 'azuredeploy.parameters.json'  # Chemin du fichier paramètres du template ARM
