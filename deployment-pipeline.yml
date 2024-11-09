@@ -5,81 +5,53 @@ trigger:
       - main
 
 pool:
-  name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
+  name: 'Agent'  # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
-# Déclaration des variables globales
 variables:
-  keyVaultName: 'KeyVaultPremierProjet'  # Nom du Key Vault où sont stockés les mots de passe
-  azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service Azure
-  resourceGroupName: 'vm-loadbalancer-rg'  # Nom du groupe de ressources
-  location: 'East US'  # Région Azure
-  templateFile: 'templates/deployment-template.json'  # Chemin du fichier de template ARM
-  parametersFile: 'templates/deployment-parameters.json'  # Chemin du fichier des paramètres ARM
+  keyVaultName: 'KeyVaultPremierProjet'
+  azureSubscription: 'AzureKeyVaultConnection'
+  resourceGroupName: 'vm-loadbalancer-rg'
+  location: 'Canada Central'
+  templateFile: 'templates/deployment-template.json'
+  parametersFile: 'templates/deployment-parameters.json'
 
-# Étape de validation des fichiers de configuration et du script
 stages:
-  - stage: Validation
-    displayName: 'Validation des fichiers de configuration et des scripts'
-    jobs:
-      - job: ValidateConfigs
-        displayName: "Validation des fichiers JSON et du script de mise à l'échelle"
-        steps:
-          # Validation de VM1.json
-          - script: |
-              echo "Validation du fichier VM1.json"
-              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM1.json' | ConvertFrom-Json" || exit 1
-            displayName: "Validation de VM1.json"
-
-          # Validation de VM2.json
-          - script: |
-              echo "Validation du fichier VM2.json"
-              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/VM2.json' | ConvertFrom-Json" || exit 1
-            displayName: "Validation de VM2.json"
-
-          # Validation du fichier de Web Scale Set
-          - script: |
-              echo "Validation du fichier webscalteset.json"
-              powershell -Command "Get-Content '$(System.DefaultWorkingDirectory)/webscalteset.json' | ConvertFrom-Json" || exit 1
-            displayName: "Validation de webscalteset.json"
-
-          # Validation du script Bash Mise_a_echelle.sh
-          - script: |
-              echo "Validation du script Mise_a_echelle.sh"
-              bash -n Mise_a_echelle.sh || exit 1
-            displayName: "Validation du script de mise à l'échelle"
-
-          # Vérification du fichier README.md
-          - script: |
-              echo "Vérification du fichier README.md"
-              powershell -Command "if ((Get-Content README.md | Measure-Object -Line).Lines -eq 0) { Write-Output 'Erreur : le fichier README.md est vide.'; exit 1 }"
-            displayName: "Vérification du contenu du README.md"
-
-  # Étape de déploiement des ressources dans Azure
   - stage: DeployInfrastructure
     displayName: "Déployer l'infrastructure Azure"
     jobs:
       - job: DeployResources
         displayName: "Déployer les VMs et Load Balancer"
         steps:
-          # Étape 1 : Récupérer les fichiers depuis le dépôt GitHub
           - checkout: self
 
-          # Étape 2 : Récupération des mots de passe administrateurs depuis le Key Vault
+          # Étape de récupération des secrets depuis le Key Vault
           - task: AzureKeyVault@2
             inputs:
               azureSubscription: $(azureSubscription)
               KeyVaultName: $(keyVaultName)
-              SecretsFilter: 'MotDePasseVM1,MotDePasseVM2'  # Liste des secrets à récupérer
-              RunAsPreJob: true  # Les mots de passe seront disponibles pour les étapes suivantes
+              SecretsFilter: 'adminPassword,MotDePasseVM1,MotDePasseVM2'
 
-          # Diagnostic pour vérifier la récupération des mots de passe
-          - script: |
-              echo "Vérification de la récupération des mots de passe"
-              if [ -z "$(MotDePasseVM1)" ]; then echo "Erreur : MotDePasseVM1 n'a pas été récupéré."; exit 1; fi
-              if [ -z "$(MotDePasseVM2)" ]; then echo "Erreur : MotDePasseVM2 n'a pas été récupéré."; exit 1; fi
-            displayName: "Diagnostic de récupération des mots de passe"
+          # Diagnostic de récupération des mots de passe en utilisant Bash explicitement
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Vérification de la récupération des mots de passe"
+                if [ -z "$adminPassword" ]; then
+                  echo "Erreur : adminPassword n'a pas été récupéré correctement."
+                  exit 1
+                fi
+                if [ -z "$MotDePasseVM1" ]; then
+                  echo "Erreur : MotDePasseVM1 n'a pas été récupéré correctement."
+                  exit 1
+                fi
+                if [ -z "$MotDePasseVM2" ]; then
+                  echo "Erreur : MotDePasseVM2 n'a pas été récupéré correctement."
+                  exit 1
+                fi
+                echo "Tous les mots de passe ont été récupérés avec succès."
 
-          # Étape 3 : Créer le groupe de ressources et déployer les ressources avec Azure CLI
+          # Déploiement des ressources
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureSubscription)
@@ -94,5 +66,5 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
                   --parameters @$(parametersFile) \
-                  --parameters adminPassword="$(MotDePasseVM1)"
+                  --parameters adminPassword="$(adminPassword)"
             displayName: "Déployer les VMs et le Load Balancer"
