@@ -13,7 +13,7 @@
             "name": "LoadBalancerFrontEnd",
             "properties": {
               "publicIPAddress": {
-                "id": "/subscriptions/c864c0a4-b728-49bb-bcd3-e1594c00a1c7/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP"
+                "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP"
               }
             }
           }
@@ -23,7 +23,7 @@
             "name": "LoadBalancerBackEnd",
             "properties": {
               "virtualMachineScaleSet": {
-                "id": "/subscriptions/c864c0a4-b728-49bb-bcd3-e1594c00a1c7/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP"
+                "id": "/subscriptions/eb1ea0e1-d647-4a29-ac20-2f1b996351ac/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachineScaleSets/WebScaleSet"
               }
             }
           }
@@ -106,4 +106,3 @@
     }
   ]
 }
-
