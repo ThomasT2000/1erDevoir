@@ -13,7 +13,7 @@ stages:
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Nom de la connexion de service Azure
+            azureSubscription: 'ServiceConnection'  # Nom de la connexion de service Azure
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
@@ -32,14 +32,14 @@ stages:
       steps:
         - task: AzureKeyVault@2
           inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
+            azureSubscription: 'ServiceConnection'  # Connexion Azure avec le service principal configuré
             KeyVaultName: 'Devoir1Key'  # Nom du KeyVault
-            SecretsFilter: 'Secret1,Secret2'  # Récupérer les secrets "Secret1" et "Secret2"
+            SecretsFilter: '*'  # Filtrer tous les secrets (Secret1, Secret2)
           
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
             deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion Azure avec le service principal configuré
+            azureResourceManagerConnection: 'ServiceConnection'  # Connexion Azure avec le service principal configuré
             subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de l'abonnement Azure
             action: 'Create Or Update Resource Group'
             resourceGroupName: '8CLD201_Devoir1'  # Nom du groupe de ressources
