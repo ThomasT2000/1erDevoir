@@ -1,70 +1,43 @@
 trigger:
-- main  # Ou la branche que tu utilises
+  branches:
+    include:
+      - main  # Exécuter le pipeline à chaque commit sur la branche principale
 
-pool:
-  name: 'Agent'  # Utilisation de l'agent auto-hébergé
+stages:
+- stage: CompileAndValidate
+  jobs:
+    - job: ARMTemplateValidation
+      displayName: "Compilation et validation du template ARM"
+      pool:
+        name: 'Azure Pipelines'
+      steps:
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: 'AzureKeyVaultConnection' 
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              # Valider le template ARM
+              az deployment group validate \
+                --resource-group 8CLD201_Devoir1_Infra \
+                --template-file azuredeploy.json \
+                --parameters azuredeploy.parameters.json
 
-variables:
-  vm1Json: 'VM1.json'
-  vm2Json: 'VM2.json'
-  webscaltesetJson: 'webscalteset.json'
-  keyVaultName: 'AzureKeyVaultConnection'
-  adminPasswordSecretName: 'adminPassword'
-
-jobs:
-- job: DeployVMs
-  displayName: 'Déployer les Machines Virtuelles'
-  steps:
-
-    # Étape 1 : Connexion à Azure CLI avec la connexion de service
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de votre connexion de service existante
-        scriptType: 'ps'  # Changer ici pour PowerShell
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          Write-Host "Connexion à Azure avec le service principal"
-          az login --service-principal -u $(azureServicePrincipalClientId) --tenant $(azureTenantId) --password $(azureServicePrincipalSecret)
-
-    # Étape 2 : Déployer les ressources via ARM template
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Connexion à Azure
-        scriptType: 'ps'  # PowerShell
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          Write-Host "Déploiement des machines virtuelles et des ressources"
-          az deployment group create `
-            --resource-group $(resourceGroupName) `
-            --template-file $(Build.SourcesDirectory)/$(vm1Json) `
-            --parameters adminPassword=$(adminPassword)
-
-          az deployment group create `
-            --resource-group $(resourceGroupName) `
-            --template-file $(Build.SourcesDirectory)/$(vm2Json) `
-            --parameters adminPassword=$(adminPassword)
-
-          az deployment group create `
-            --resource-group $(resourceGroupName) `
-            --template-file $(Build.SourcesDirectory)/$(webscaltesetJson)
-        
-    # Étape 3 : Vérification du déploiement
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour la vérification
-        scriptType: 'ps'  # PowerShell
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          Write-Host "Vérification du déploiement"
-          az vm list -g $(resourceGroupName) --show-details --out table
-          az resource show --ids $(webscaltesetId)
-
-    # Étape 4 : Déconnexion d'Azure CLI
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour la déconnexion
-        scriptType: 'ps'  # PowerShell
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          Write-Host "Déconnexion d'Azure CLI"
-          az logout
+- stage: DeployToAzure
+  jobs:
+    - job: DeployARMTemplate
+      displayName: "Déploiement du Template ARM dans Azure"
+      pool:
+        vmImage: 'ubuntu-latest'  # Utiliser un agent Ubuntu pour ce job
+      steps:
+        - task: AzureResourceManagerTemplateDeployment@3
+          inputs:
+            deploymentScope: 'Resource Group'
+            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Utilisez votre connexion de service Azure
+            subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205' 
+            action: 'Create Or Update Resource Group'
+            resourceGroupName: 'KeyVaultGroup'  # Nom du groupe de ressources
+            location: 'Canada Central'  # Choisissez la région appropriée
+            templateLocation: 'Linked artifact'  # Utiliser un template lié
+            csmFile: 'azuredeploy.json'  # Le fichier template
+            csmParametersFile: 'azuredeploy.parameters.json'  # Fichier de paramètres
