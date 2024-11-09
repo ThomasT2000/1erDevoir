@@ -1,8 +1,8 @@
 trigger:
-- main  # Ou votre branche spécifique
+- main  # Ou la branche que tu utilises
 
 pool:
-  name: 'Agent'  # Utilisation de votre agent auto-hébergé
+  name: 'Agent'  # Utilisation de l'agent auto-hébergé
 
 variables:
   vm1Json: 'VM1.json'
@@ -20,42 +20,42 @@ jobs:
     - task: AzureCLI@2
       inputs:
         azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de votre connexion de service existante
-        scriptType: 'bash'  # Ou 'ps' pour PowerShell
+        scriptType: 'ps'  # Changer ici pour PowerShell
         scriptLocation: 'inlineScript'
         inlineScript: |
-          echo "Connexion à Azure avec le service principal"
+          Write-Host "Connexion à Azure avec le service principal"
           az login --service-principal -u $(azureServicePrincipalClientId) --tenant $(azureTenantId) --password $(azureServicePrincipalSecret)
 
     # Étape 2 : Déployer les ressources via ARM template
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de la même connexion
-        scriptType: 'bash'
+        azureSubscription: 'AzureKeyVaultConnection'  # Connexion à Azure
+        scriptType: 'ps'  # PowerShell
         scriptLocation: 'inlineScript'
         inlineScript: |
-          echo "Déploiement des machines virtuelles et des ressources"
-          az deployment group create \
-            --resource-group $(resourceGroupName) \
-            --template-file $(Build.SourcesDirectory)/$(vm1Json) \
+          Write-Host "Déploiement des machines virtuelles et des ressources"
+          az deployment group create `
+            --resource-group $(resourceGroupName) `
+            --template-file $(Build.SourcesDirectory)/$(vm1Json) `
             --parameters adminPassword=$(adminPassword)
 
-          az deployment group create \
-            --resource-group $(resourceGroupName) \
-            --template-file $(Build.SourcesDirectory)/$(vm2Json) \
+          az deployment group create `
+            --resource-group $(resourceGroupName) `
+            --template-file $(Build.SourcesDirectory)/$(vm2Json) `
             --parameters adminPassword=$(adminPassword)
 
-          az deployment group create \
-            --resource-group $(resourceGroupName) \
+          az deployment group create `
+            --resource-group $(resourceGroupName) `
             --template-file $(Build.SourcesDirectory)/$(webscaltesetJson)
         
     # Étape 3 : Vérification du déploiement
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'AzureKeyVaultConnection'  # Encore la même connexion
-        scriptType: 'bash'
+        azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour la vérification
+        scriptType: 'ps'  # PowerShell
         scriptLocation: 'inlineScript'
         inlineScript: |
-          echo "Vérification du déploiement"
+          Write-Host "Vérification du déploiement"
           az vm list -g $(resourceGroupName) --show-details --out table
           az resource show --ids $(webscaltesetId)
 
@@ -63,8 +63,8 @@ jobs:
     - task: AzureCLI@2
       inputs:
         azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour la déconnexion
-        scriptType: 'bash'
+        scriptType: 'ps'  # PowerShell
         scriptLocation: 'inlineScript'
         inlineScript: |
-          echo "Déconnexion d'Azure CLI"
+          Write-Host "Déconnexion d'Azure CLI"
           az logout
