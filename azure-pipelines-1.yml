@@ -7,7 +7,6 @@ pool:
   name: 'Agent' # Nom de l'agent auto-hébergé utilisé pour exécuter les tâches du pipeline
 
 variables:
-  keyVaultName: 'KeyVaultPremierProjet'
   vm1Json: 'VM1.json'
   vm2Json: 'VM2.json'
   webscaleJson: 'webscalteset.json'
