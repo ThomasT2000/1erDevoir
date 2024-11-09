@@ -3,17 +3,20 @@ trigger:
     include:
       - main
 
+pool:
+  name: 'Agent'  # Utilisation de ton agent auto-hébergé
+
 stages:
 - stage: CompileAndValidate
   jobs:
     - job: ARMTemplateValidation
       displayName: "Compilation et validation du template ARM"
       pool:
-        name: 'Agent'  # Utiliser l'agent auto-hébergé nommé "Agent"
+        name: 'Agent'  # Utilisation de l'agent auto-hébergé
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'ServiceConnection'  # Nom de la connexion de service Azure
+            azureSubscription: 'ServiceConnection'  # Utilisation de la nouvelle connexion de service
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
@@ -28,21 +31,21 @@ stages:
     - job: DeployARMTemplate
       displayName: "Déploiement du Template ARM dans Azure"
       pool:
-        vmImage: 'ubuntu-latest'  # Utiliser un agent Ubuntu pour ce job
+        name: 'Agent'  # Utilisation de l'agent auto-hébergé
       steps:
         - task: AzureKeyVault@2
           inputs:
-            azureSubscription: 'ServiceConnection'  # Connexion Azure avec le service principal configuré
-            KeyVaultName: 'Devoir1Key'  # Nom du KeyVault
+            azureSubscription: 'ServiceConnection'  # Utilisation de la connexion de service correcte
+            KeyVaultName: 'Devoir1Key'  # Nom de ton KeyVault
             SecretsFilter: '*'  # Filtrer tous les secrets (Secret1, Secret2)
           
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
             deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'ServiceConnection'  # Connexion Azure avec le service principal configuré
-            subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de l'abonnement Azure
+            azureResourceManagerConnection: 'ServiceConnection'  # Connexion de service
+            subscriptionId: '3f8680cf-25db-4731-b00a-e524d785d205'  # ID de la souscription Azure
             action: 'Create Or Update Resource Group'
-            resourceGroupName: '8CLD201_Devoir1'  # Nom du groupe de ressources
+            resourceGroupName: '8CLD201_Devoir1'
             location: 'Canada Central'
             templateLocation: 'Linked artifact'
             csmFile: 'azuredeploy.json'  # Chemin du fichier template ARM
