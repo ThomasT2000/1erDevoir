@@ -16,14 +16,14 @@ stages:
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'ServiceConnection' 
+            azureSubscription: 'ServiceConnection'  # Utilisation de la nouvelle connexion de service
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
               # Validation du template ARM avec PowerShell
-              az deployment group validate `
-                --resource-group 8CLD201_Devoir1 `
-                --template-file azuredeploy.json `
+              az deployment group validate 
+                --resource-group 8CLD201_Devoir1 
+                --template-file azuredeploy.json 
                 --parameters azuredeploy.parameters.json
               
 - stage: DeployToAzure
@@ -35,7 +35,7 @@ stages:
       steps:
         - task: AzureKeyVault@2
           inputs:
-            azureSubscription: 'ServiceConnection'  
+            azureSubscription: 'ServiceConnection'  # Utilisation de la connexion de service
             KeyVaultName: 'CoffreDevoir1'  # Nom de ton KeyVault
             SecretsFilter: '*'  # Filtrer tous les secrets (Secret1, Secret2)
           
