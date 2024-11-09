@@ -1,42 +1,70 @@
 trigger:
-  branches:
-    include:
-      - main  # Exécuter le pipeline à chaque commit sur la branche principale
+- main  # Ou votre branche spécifique
 
-stages:
-- stage: CompileAndValidate
-  jobs:
-    - job: ARMTemplateValidation
-      displayName: "Compilation et validation du template ARM"
-      pool:
-        name: 'Agent'  # Agent auto-hébergé
-      steps:
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour accéder à Azure
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              az deployment group validate \
-                --resource-group 8CLD201_Devoir1_Infra \
-                --template-file azuredeploy.json \
-                --parameters azuredeploy.parameters.json
+pool:
+  name: 'Agent'  # Utilisation de votre agent auto-hébergé
 
-- stage: DeployToAzure
-  jobs:
-    - job: DeployARMTemplate
-      displayName: "Déploiement du Template ARM dans Azure"
-      pool:
-        name: 'Agent'  # Agent auto-hébergé
-      steps:
-        - task: AzureResourceManagerTemplateDeployment@3
-          inputs:
-            deploymentScope: 'Resource Group'
-            azureResourceManagerConnection: 'AzureKeyVaultConnection'  # Connexion de service pour accéder à Azure
-            subscriptionId: '375be4f5-a251-4fb2-8f5a-13d6f5a2cedf'  # Utiliser le bon abonnement
-            action: 'Create Or Update Resource Group'
-            resourceGroupName: '8CLD201_Devoir1_Infra'
-            location: 'Canada Central'
-            templateLocation: 'Linked artifact'
-            csmFile: 'azuredeploy.json'
-            csmParametersFile: 'azuredeploy.parameters.json'
+variables:
+  vm1Json: 'VM1.json'
+  vm2Json: 'VM2.json'
+  webscaltesetJson: 'webscalteset.json'
+  keyVaultName: 'AzureKeyVaultConnection'
+  adminPasswordSecretName: 'adminPassword'
+
+jobs:
+- job: DeployVMs
+  displayName: 'Déployer les Machines Virtuelles'
+  steps:
+
+    # Étape 1 : Connexion à Azure CLI avec la connexion de service
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de votre connexion de service existante
+        scriptType: 'bash'  # Ou 'ps' pour PowerShell
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Connexion à Azure avec le service principal"
+          az login --service-principal -u $(azureServicePrincipalClientId) --tenant $(azureTenantId) --password $(azureServicePrincipalSecret)
+
+    # Étape 2 : Déployer les ressources via ARM template
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'AzureKeyVaultConnection'  # Utilisation de la même connexion
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Déploiement des machines virtuelles et des ressources"
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file $(Build.SourcesDirectory)/$(vm1Json) \
+            --parameters adminPassword=$(adminPassword)
+
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file $(Build.SourcesDirectory)/$(vm2Json) \
+            --parameters adminPassword=$(adminPassword)
+
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file $(Build.SourcesDirectory)/$(webscaltesetJson)
+        
+    # Étape 3 : Vérification du déploiement
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'AzureKeyVaultConnection'  # Encore la même connexion
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Vérification du déploiement"
+          az vm list -g $(resourceGroupName) --show-details --out table
+          az resource show --ids $(webscaltesetId)
+
+    # Étape 4 : Déconnexion d'Azure CLI
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'AzureKeyVaultConnection'  # Connexion de service pour la déconnexion
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Déconnexion d'Azure CLI"
+          az logout
