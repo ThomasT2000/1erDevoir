@@ -16,7 +16,7 @@ stages:
       steps:
         - task: AzureCLI@2
           inputs:
-            azureSubscription: 'ServiceConnection'  # Utilisation de la nouvelle connexion de service
+            azureSubscription: 'ServiceConnection'  # Utilisation de la connexion de service
             scriptType: 'pscore'  # Utiliser PowerShell Core
             scriptLocation: 'inlineScript'
             inlineScript: |
